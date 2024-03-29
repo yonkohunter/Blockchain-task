@@ -1,17 +1,18 @@
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.8;
 
 
-import "./PriceConverter.sol";
+
 
 error NotOwner();
 
 contract FundMe {
-    using PriceConverter for uint256;
+    
 
     mapping(address => uint256) public addressToAmountFunded;
     address[] public funders;
-    address public curr_owner;
+    address public owner;
     address public new_owner;
 
     // Could we make this constant?  /* hint: no! We should make it immutable! */
@@ -42,7 +43,7 @@ contract FundMe {
     
     
     modifier onlyOwner {
-        require(msg.sender == owner) revert NotOwner();
+       if (msg.sender != owner) revert NotOwner();
         _;
     }
 
@@ -70,4 +71,13 @@ contract FundMe {
         (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}("");
         require(callSuccess, "Call failed");
     }
+    fallback() external payable {
+        fund();
+    }
+
+    receive() external payable {
+        fund();
+    }
+
     
+}
